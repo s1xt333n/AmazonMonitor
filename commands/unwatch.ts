@@ -1,5 +1,6 @@
 import { Client, Message } from 'discord.js'
 import { getWatchlist, removeWatchlistItem } from '../common/watchlist.js'
+import { safeSend } from '../common/discord-helpers.js'
 
 export default {
   name: 'unwatch',
@@ -10,22 +11,22 @@ export default {
 }
 
 async function run(bot: Client, message: Message, args: string[]) {
-  if (!parseInt(args[1])) return message.channel.send('Invalid number/item')
+  if (!parseInt(args[1])) return safeSend(message, 'Invalid number/item')
 
   const index = parseInt(args[1])
   const rows = await getWatchlist()
 
-  if (!rows || rows.length == 0) return message.channel.send('No existing items in the watchlist to remove!')
+  if (!rows || rows.length == 0) return safeSend(message, 'No existing items in the watchlist to remove!')
 
   const item = rows[index - 1]
 
-  if (!item) return message.channel.send('Not an existing item!')
+  if (!item) return safeSend(message, 'Not an existing item!')
 
   if (item.type === 'link') {
     // @ts-ignore
     await removeWatchlistItem(item.link)
     // @ts-ignore
-    message.channel.send('Successfully removed item: ' + item.link)
+    safeSend(message, 'Successfully removed item: ' + item.link)
     return
   }
 
@@ -33,7 +34,7 @@ async function run(bot: Client, message: Message, args: string[]) {
     // @ts-ignore
     await removeWatchlistItem(item.query)
     // @ts-ignore
-    message.channel.send('Successfully removed item: ' + item.query)
+    safeSend(message, 'Successfully removed item: ' + item.query)
     return
   }
 }

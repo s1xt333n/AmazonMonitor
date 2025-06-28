@@ -3,6 +3,7 @@ import { addWatchlistItem, getWatchlist } from '../common/watchlist.js'
 import { Client, Message } from 'discord.js'
 import { category, item, search } from '../common/amazon.js'
 import { parseArgs } from '../common/arguments.js'
+import { safeSend } from '../common/discord-helpers.js'
 
 const { cache_limit, tld, guild_item_limit }: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 
@@ -54,12 +55,12 @@ async function run(bot: Client, message: Message, args: string[]) {
   processed.type = processed.link ? 'link' : processed.query ? 'query' : processed.category ? 'category' : null
 
   if (watchlist.length >= guild_item_limit) {
-    message.channel.send(`You have reached the maximum amount of items (${guild_item_limit})`)
+    safeSend(message, `You have reached the maximum amount of items (${guild_item_limit})`)
     return
   }
 
   if (!processed.type) {
-    message.channel.send('Please provide a valid link or query')
+    safeSend(message, 'Please provide a valid link or query')
     return
   }
 
@@ -70,7 +71,7 @@ async function run(bot: Client, message: Message, args: string[]) {
   case 'link': {
     // @ts-ignore this is guaranteed to be a link
     if (!processed.link?.startsWith('http')) {
-      message.channel.send('Please provide a valid link')
+      safeSend(message, 'Please provide a valid link')
       return
     }
 
@@ -79,7 +80,7 @@ async function run(bot: Client, message: Message, args: string[]) {
     const existing = watchlist.find(item => item.link === processed.link)
 
     if (existing) {
-      message.channel.send('Item already exists in watchlist')
+      safeSend(message, 'Item already exists in watchlist')
       return
     }
 
@@ -87,7 +88,7 @@ async function run(bot: Client, message: Message, args: string[]) {
     const product = await item(processed.link)
 
     if (!product) {
-      message.channel.send('Invalid link')
+      safeSend(message, 'Invalid link')
       return
     }
 
@@ -111,7 +112,7 @@ async function run(bot: Client, message: Message, args: string[]) {
   case 'category': {
     // @ts-ignore this is guaranteed to be a category
     if (!processed.category?.startsWith('http')) {
-      message.channel.send('Please provide a valid link')
+      safeSend(message, 'Please provide a valid link')
       return
     }
 
@@ -120,7 +121,7 @@ async function run(bot: Client, message: Message, args: string[]) {
     const existing = watchlist.find(item => item.link === processed.category)
 
     if (existing) {
-      message.channel.send('Category already exists in watchlist')
+      safeSend(message, 'Category already exists in watchlist')
       return
     }
 
@@ -128,7 +129,7 @@ async function run(bot: Client, message: Message, args: string[]) {
     const results = await category(processed.category)
 
     if (!results) {
-      message.channel.send('Invalid link')
+      safeSend(message, 'Invalid link')
       return
     }
 
@@ -155,7 +156,7 @@ async function run(bot: Client, message: Message, args: string[]) {
     const existing = watchlist.find(item => item.query === processed.query)
 
     if (existing) {
-      message.channel.send('Query already exists in watchlist')
+      safeSend(message, 'Query already exists in watchlist')
       return
     }
 
@@ -163,7 +164,7 @@ async function run(bot: Client, message: Message, args: string[]) {
     const results = await search(processed.query, tld)
 
     if (!results || results.length < 1) {
-      message.channel.send(`No results found for "${processed.query}"`)
+      safeSend(message, `No results found for "${processed.query}"`)
       return
     }
 
@@ -199,5 +200,5 @@ async function run(bot: Client, message: Message, args: string[]) {
     response += `\nPrice must be more than ${processed?.symbol || '$'}${processed.difference} off previous detected price`
   }
 
-  message.channel.send(response)
+  safeSend(message, response)
 }

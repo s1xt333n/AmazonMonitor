@@ -1,3 +1,4 @@
+import { safeSend } from '../common/discord-helpers.js'
 import { Client, EmbedBuilder, Message } from 'discord.js'
 import { trim } from '../common/utils.js'
 import { getWatchlist } from '../common/watchlist.js'
@@ -96,7 +97,7 @@ async function run(bot: Client, message: Message) {
   for (const desc of chunks) {
     embed.setDescription(desc.join(''))
 
-    await message.channel.send({
+    await safeSend(message, {
       embeds: [embed]
     })
   }

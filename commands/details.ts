@@ -1,6 +1,7 @@
 import { EmbedBuilder, Guild, Message } from 'discord.js'
 import { linkToAsin, priceFormat } from '../common/utils.js'
 import { item } from '../common/amazon.js'
+import { safeSend } from '../common/discord-helpers.js'
 
 export default {
   name: 'details',
@@ -15,7 +16,7 @@ async function run(guild: Guild, message: Message, args: string[]) {
   const tld = args[1].split('amazon.')[1].split('/')[0]
 
   if (!asin) {
-    message.channel.send('Invalid link')
+    safeSend(message, 'Invalid link')
     return
   }
 
@@ -58,7 +59,7 @@ async function run(guild: Guild, message: Message, args: string[]) {
     }
     ])
 
-  message.channel.send({
+  safeSend(message, {
     embeds: [embed]
   })
 }

@@ -4,6 +4,7 @@ import { trim } from '../common/utils.js'
 import debug from '../common/debug.js'
 import { search } from '../common/amazon.js'
 import { parseArgs } from '../common/arguments.js'
+import { safeSend } from '../common/discord-helpers.js'
 
 const { tld } = JSON.parse(fs.readFileSync('./config.json').toString())
 
@@ -34,7 +35,7 @@ async function run(bot: Client, message: Message, args: string[]) {
   const parsedArgs = parseArgs(args, argDef)
 
   if (!phrase) {
-    message.channel.send('Please provide a search term')
+    safeSend(message, 'Please provide a search term')
     return
   }
 
@@ -47,7 +48,7 @@ async function run(bot: Client, message: Message, args: string[]) {
   const results = await search(phrase, tld)
 
   if (!results || results.length < 1) {
-    message.channel.send(`No results found for "${phrase}"`)
+    safeSend(message, `No results found for "${phrase}"`)
     return
   }
 
@@ -71,7 +72,7 @@ async function run(bot: Client, message: Message, args: string[]) {
     ])
   }
 
-  message.channel.send({
+  safeSend(message, {
     embeds: [embed]
   })
 }

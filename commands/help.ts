@@ -1,3 +1,4 @@
+import { safeSend } from '../common/discord-helpers.js'
 import { Client, EmbedBuilder, EmbedField, Message } from 'discord.js'
 import fs from 'fs'
 
@@ -27,7 +28,7 @@ async function run(bot: Client, message: Message, commands: { default: Command }
 
   embed.addFields(fields)
 
-  message.channel.send({
+  safeSend(message, {
     embeds: [embed]
   })
 }
