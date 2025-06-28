@@ -116,3 +116,8 @@ yarn.lock
 
 # typescript build
 built/
+
+# Temporary test files
+test-*.mjs
+test-*.js
+tmp/
