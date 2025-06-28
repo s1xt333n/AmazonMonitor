@@ -4,12 +4,15 @@ import { trim } from '../common/utils.js'
 import debug from '../common/debug.js'
 import { search } from '../common/amazon.js'
 import { parseArgs } from '../common/arguments.js'
+import { safeSend } from '../common/discord-helpers.js'
+import { EnhancedEmbedBuilder } from '../components/ui/embeds.js'
+import { createPaginationButtons, createActionButtons } from '../components/ui/buttons.js'
 
 const { tld } = JSON.parse(fs.readFileSync('./config.json').toString())
 
 export default {
   name: 'search',
-  description: 'Search and return the top 10 items using a search term',
+  description: 'Search and return the top 10 items using a search term', 
   usage: 'search [search term] [optional: -p for price limit]',
   type: 'view',
   run
@@ -30,48 +33,72 @@ const argDef = {
 
 async function run(bot: Client, message: Message, args: string[]) {
   args.splice(0, 1)
-  const phrase = args.join(' ')
+  const phrase = args.join(' ').replace(/\s*-[a-z]\s*\d*\s*/g, '').trim()
   const parsedArgs = parseArgs(args, argDef)
 
   if (!phrase) {
-    message.channel.send('Please provide a search term')
+    const enhancedEmbed = new EnhancedEmbedBuilder()
+    enhancedEmbed.setError(enhancedEmbed.getMessage('search_no_term'))
+    safeSend(message, { embeds: [enhancedEmbed] })
     return
   }
 
   debug.log(`Searching for ${phrase}...`)
 
-  const embed = new EmbedBuilder()
-    .setColor('Orange')
-    .setTitle(`Search results for phrase: ${phrase}`)
-
   const results = await search(phrase, tld)
 
   if (!results || results.length < 1) {
-    message.channel.send(`No results found for "${phrase}"`)
+    const enhancedEmbed = new EnhancedEmbedBuilder()
+    enhancedEmbed.setError(enhancedEmbed.getMessage('search_no_results', { query: phrase }))
+    safeSend(message, { embeds: [enhancedEmbed] })
     return
   }
 
-  for (let i = 0; i < 10; i++) {
-    if (!results[i]) break
+  // Filter by price limit if specified
+  const filteredResults = parsedArgs.priceLimit 
+    ? results.filter(result => parseFloat(result.price) <= (parsedArgs.priceLimit as number))
+    : results
 
-    const result = results[i]
+  // Pagination logic
+  const itemsPerPage = 5
+  const totalPages = Math.ceil(filteredResults.length / itemsPerPage)
+  const currentPage = 1
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = Math.min(startIndex + itemsPerPage, filteredResults.length)
+  const pageResults = filteredResults.slice(startIndex, endIndex)
 
-    if (parsedArgs.priceLimit && parseFloat(result.price) > (parsedArgs.priceLimit as number)) continue
+  const enhancedEmbed = new EnhancedEmbedBuilder()
+    .setSearchResults(phrase)
 
-    const priceWithCoupon = result.coupon > 0 ? parseFloat(result.price) - result.coupon : result.price
+  pageResults.forEach((result, index) => {
+    const priceWithCoupon = result.coupon > 0 ? parseFloat(result.price) - result.coupon : parseFloat(result.price)
+    const priceText = parseFloat(result.price) 
+      ? `${result.symbol}${result.coupon > 0 
+          ? `${priceWithCoupon.toFixed(2)} (${result.symbol}${result.coupon.toFixed(2)} coupon)` 
+          : result.price}`
+      : 'Pas en stock'
 
-    embed.addFields([
-      {
-        name: trim(result.fullTitle, 50),
-        value: `${parseFloat(result.price) ? `${result.symbol + (
-          result.coupon > 0 ? `${priceWithCoupon} (${result.symbol + result.coupon.toFixed(2)} coupon)` : result.price
-        )}` : 'Not in stock'} - ${result.fullLink}`,
-        inline: false
-      },
-    ])
+    enhancedEmbed.addFields([{
+      name: `${startIndex + index + 1}. ${trim(result.fullTitle, 50)}`,
+      value: `${priceText} - ${result.fullLink}`,
+      inline: false
+    }])
+  })
+
+  const components = []
+  
+  // Add pagination if there are multiple pages
+  if (totalPages > 1) {
+    const paginationRow = createPaginationButtons({
+      currentPage,
+      totalPages,
+      customId: 'search'
+    })
+    components.push(paginationRow)
   }
 
-  message.channel.send({
-    embeds: [embed]
+  safeSend(message, {
+    embeds: [enhancedEmbed],
+    components
   })
 }

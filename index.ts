@@ -1,8 +1,9 @@
-import Discord, { Partials } from 'discord.js'
+import { Client, Partials, Message } from 'discord.js'
 import fs from 'fs'
 import * as debug from './common/debug.js'
 import { initBrowser } from './common/browser.js'
 import { startWatcher } from './common/watcher.js'
+import { handleButtonInteraction } from './components/interaction-handler.js'
 
 declare global {
   var browser: import('puppeteer').Browser
@@ -10,7 +11,7 @@ declare global {
 
 const __dirname = import.meta.url.split('/').slice(0, -1).join('/')
 
-const bot = new Discord.Client({
+const bot = new Client({
   intents: [
     'Guilds',
     'GuildMembers',
@@ -24,7 +25,7 @@ const bot = new Discord.Client({
 })
 
 const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
-const commands = new Discord.Collection()
+const commands = new Map()
 
 bot.login(config.token)
 
@@ -73,12 +74,17 @@ bot.on('ready', async () => {
   debug.log('Bot is ready!', 'info')
 })
 
-bot.on('messageCreate', function (message) {
+bot.on('interactionCreate', async interaction => {
+  if (interaction.isButton()) {
+    await handleButtonInteraction(interaction)
+  }
+})
+
+bot.on('messageCreate', function (message: Message) {
   if (message.author.bot || !message.content.startsWith(config.prefix)) return
 
   const command = message.content.split(config.prefix)[1].split(' ')[0],
     args = message.content.split(' '),
-    // @ts-expect-error This is fine, it's just how the import works
     cmd = commands.get(command)?.default
 
   if (cmd) {
@@ -97,12 +103,16 @@ bot.on('messageCreate', function (message) {
   }
 })
 
-async function exec(message: Discord.Message, args: string[], cmd: Command) {
+async function exec(message: Message, args: string[], cmd: Command) {
   const ch = await message.channel.fetch()
-  ch.sendTyping()
+  if ('sendTyping' in ch) {
+    ch.sendTyping()
+  }
 
   await cmd.run(bot, message, args).catch((e: Error) => {
-    message.channel.send(e.message)
+    if ('send' in message.channel) {
+      message.channel.send(e.message)
+    }
     debug.log(e, 'error')
   })
 }
