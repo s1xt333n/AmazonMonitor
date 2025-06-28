@@ -3,6 +3,7 @@ import fs from 'fs'
 import * as debug from './common/debug.js'
 import { initBrowser } from './common/browser.js'
 import { startWatcher } from './common/watcher.js'
+import { handleButtonInteraction } from './components/interaction-handler.js'
 
 declare global {
   var browser: import('puppeteer').Browser
@@ -71,6 +72,12 @@ bot.on('ready', async () => {
   startWatcher(bot)
 
   debug.log('Bot is ready!', 'info')
+})
+
+bot.on('interactionCreate', async interaction => {
+  if (interaction.isButton()) {
+    await handleButtonInteraction(interaction)
+  }
 })
 
 bot.on('messageCreate', function (message: Message) {

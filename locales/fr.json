@@ -1,0 +1,89 @@
+{
+  "commands": {
+    "search": {
+      "name": "search",
+      "aliases": ["chercher", "recherche", "s"],
+      "description": "Rechercher et retourner les 10 meilleurs articles en utilisant un terme de recherche",
+      "usage": "search [terme de recherche] [optionnel: -p pour limite de prix]"
+    },
+    "watch": {
+      "name": "watch",
+      "aliases": ["surveiller", "ajouter", "w"],
+      "description": "Ajouter et surveiller un lien Amazon, une requête ou une catégorie",
+      "usage": "watch [type d'argument (-l pour lien, -q pour requête, -c pour catégorie)] [lien Amazon, lien de catégorie, ou requête de recherche] [optionnel: -p pour limite de prix, -d pour différence de prix, -e pour pourcentage de prix]"
+    },
+    "watchlist": {
+      "name": "watchlist",
+      "aliases": ["liste", "surveillance", "wl"],
+      "description": "Afficher la liste de surveillance actuelle",
+      "usage": "watchlist"
+    },
+    "unwatch": {
+      "name": "unwatch",
+      "aliases": ["supprimer", "retirer", "uw"],
+      "description": "Supprimer de la liste de surveillance en utilisant un numéro",
+      "usage": "unwatch [numéro]"
+    },
+    "details": {
+      "name": "details",
+      "aliases": ["détails", "info", "d"],
+      "description": "Retourner les détails en utilisant un lien Amazon",
+      "usage": "details [lien Amazon]"
+    },
+    "help": {
+      "name": "help",
+      "aliases": ["aide", "h"],
+      "description": "Afficher cette aide",
+      "usage": "help"
+    }
+  },
+  "messages": {
+    "search_no_term": "Veuillez fournir un terme de recherche",
+    "search_no_results": "Aucun résultat trouvé pour \"{query}\"",
+    "search_results_title": "🔍 Résultats de recherche pour : {query}",
+    "watch_limit_reached": "❌ Vous avez atteint le nombre maximum d'articles ({limit})",
+    "watch_invalid_link": "❌ Veuillez fournir un lien valide",
+    "watch_invalid_query": "❌ Veuillez fournir un lien ou une requête valide",
+    "watch_item_exists": "⚠️ L'article existe déjà dans la liste de surveillance",
+    "watch_success_link": "✅ Article ajouté avec succès à la surveillance",
+    "watch_success_query": "✅ Requête ajoutée avec succès : {query}",
+    "watch_success_category": "✅ Catégorie ajoutée avec succès : {category}",
+    "watch_price_limit": "💰 Prix doit être inférieur à {symbol}{price}",
+    "watch_price_percentage": "📊 Prix doit être réduit de plus de {percentage}% par rapport au prix précédent détecté",
+    "watch_price_difference": "💸 Prix doit être réduit de plus de {symbol}{difference} par rapport au prix précédent détecté",
+    "unwatch_invalid": "❌ Numéro/article invalide",
+    "unwatch_empty": "📭 Aucun article existant dans la liste de surveillance à supprimer !",
+    "unwatch_not_found": "❌ Ce n'est pas un article existant !",
+    "unwatch_success": "✅ Article supprimé avec succès : {item}",
+    "details_invalid_link": "❌ Lien invalide",
+    "price_alert_title": "🔴 Alerte de prix pour \"{item}\"",
+    "price_old": "Ancien prix",
+    "price_new": "Nouveau prix", 
+    "price_with_coupon": "(réduction de {amount} avec coupon)",
+    "in_stock_alert": "🟢 Article maintenant en stock !",
+    "not_in_stock": "Pas en stock",
+    "price": "Prix",
+    "rating": "Note",
+    "shipping": "Livraison",
+    "availability": "Disponibilité",
+    "seller": "Vendeur",
+    "features": "Caractéristiques"
+  },
+  "ui": {
+    "buttons": {
+      "previous": "⬅️ Précédent",
+      "next": "➡️ Suivant", 
+      "details": "🔍 Détails",
+      "add_to_watch": "⭐ Ajouter à la surveillance",
+      "remove": "🗑️ Supprimer",
+      "page_info": "📄 Page {current}/{total}"
+    },
+    "colors": {
+      "search": "Blue",
+      "success": "Green", 
+      "error": "Red",
+      "warning": "Orange",
+      "info": "Purple"
+    }
+  }
+}

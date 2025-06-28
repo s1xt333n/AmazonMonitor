@@ -1,6 +1,7 @@
 import { Client, EmbedBuilder } from 'discord.js'
 import fs from 'fs'
 import { parseParams, priceFormat } from './utils.js'
+import { EnhancedEmbedBuilder } from '../components/ui/embeds.js'
 
 export async function sendNotifications(bot: Client, notifications: NotificationData[]) {
   const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
@@ -31,35 +32,35 @@ export async function sendNotifications(bot: Client, notifications: Notification
 }
 
 export async function sendInStock(bot: Client, notification: NotificationData) {
-  const embed = new EmbedBuilder()
-    .setTitle(`In-stock alert for "${notification.itemName}"`)
+  const enhancedEmbed = new EnhancedEmbedBuilder()
+  
+  enhancedEmbed
+    .setInStockAlert()
+    .setTitle(`📦 ${notification.itemName}`)
     .setAuthor({
       name: 'AmazonMonitor'
     })
     .setThumbnail(notification.image)
-    .setDescription(`New Price: ${notification.symbol} ${notification.newPrice}\n\n${notification.link}`)
-    .setColor('Green')
+    .setDescription(`${enhancedEmbed.getMessage('price_new')}: ${notification.symbol} ${notification.newPrice}\n\n${notification.link}`)
     
   const channel = await bot.channels.fetch(notification.channelId)
 
   // @ts-ignore This can never be a category channel
-  channel.send({ embeds: [embed] })
+  channel.send({ embeds: [enhancedEmbed] })
 }
 
 export async function sendPriceChange(bot: Client, notification: NotificationData) {
-  const embed = new EmbedBuilder()
-    .setTitle(`Price alert for "${notification.itemName}"`)
+  const enhancedEmbed = new EnhancedEmbedBuilder()
+    .setPriceAlert(notification.itemName)
     .setAuthor({
       name: 'AmazonMonitor'
     })
     .setThumbnail(notification.image)
-    .setDescription(`Old Price: ${notification.symbol}${priceFormat(notification.oldPrice)}\nNew Price: ${notification.symbol}${notification.newPrice.toFixed(2) + (
-      notification.coupon > 0 ? ` (${notification.symbol}${notification.coupon.toFixed(2)} off with coupon)` : ''
-    )}\n\n${notification.link}`)
-    .setColor('Green')
+    .setDescription(notification.link)
+    .addPriceField(notification.oldPrice, notification.newPrice, notification.symbol, notification.coupon)
 
   const channel = await bot.channels.fetch(notification.channelId)
 
   // @ts-ignore This can never be a category channel
-  channel.send({ embeds: [embed] })
+  channel.send({ embeds: [enhancedEmbed] })
 }

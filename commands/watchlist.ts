@@ -3,6 +3,8 @@ import { Client, EmbedBuilder, Message } from 'discord.js'
 import { trim } from '../common/utils.js'
 import { getWatchlist } from '../common/watchlist.js'
 import debug from '../common/debug.js'
+import { EnhancedEmbedBuilder } from '../components/ui/embeds.js'
+import { createSelectionButtons, createPaginationButtons } from '../components/ui/buttons.js'
 
 export default {
   name: 'watchlist',

@@ -4,6 +4,7 @@ import { Client, Message } from 'discord.js'
 import { category, item, search } from '../common/amazon.js'
 import { parseArgs } from '../common/arguments.js'
 import { safeSend } from '../common/discord-helpers.js'
+import { EnhancedEmbedBuilder } from '../components/ui/embeds.js'
 
 const { cache_limit, tld, guild_item_limit }: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 

@@ -2,6 +2,7 @@ import { EmbedBuilder, Guild, Message } from 'discord.js'
 import { linkToAsin, priceFormat } from '../common/utils.js'
 import { item } from '../common/amazon.js'
 import { safeSend } from '../common/discord-helpers.js'
+import { EnhancedEmbedBuilder } from '../components/ui/embeds.js'
 
 export default {
   name: 'details',
@@ -16,7 +17,9 @@ async function run(guild: Guild, message: Message, args: string[]) {
   const tld = args[1].split('amazon.')[1].split('/')[0]
 
   if (!asin) {
-    safeSend(message, 'Invalid link')
+    const enhancedEmbed = new EnhancedEmbedBuilder()
+    enhancedEmbed.setError(enhancedEmbed.getMessage('details_invalid_link'))
+    safeSend(message, { embeds: [enhancedEmbed] })
     return
   }
 
@@ -28,38 +31,28 @@ async function run(guild: Guild, message: Message, args: string[]) {
     if (!product[k] || product[k].length < 1) product[k] = 'none'
   })
 
-  const embed = new EmbedBuilder()
-    .setColor('Orange')
+  const enhancedEmbed = new EnhancedEmbedBuilder()
     .setTitle(product.fullTitle)
-    .setAuthor({
-      name: product.seller.includes('\n') ? 'invalid' : product.seller,
+    .setColor('Purple')
+    .setThumbnail(product.image)
+    .setDescription(product.fullLink)
+    .addProductFields(product)
+
+  if (product.seller && product.seller !== 'none') {
+    enhancedEmbed.setAuthor({
+      name: product.seller.includes('\n') ? 'Vendeur invalide' : product.seller,
     })
-    .setImage(product.image)
-    // @ts-ignore Fine as well
-    .setDescription(`${product.fullLink}\n${product.features != 'none' ? product.features.join('\n\n'):''}`)
-    .addFields([{
-      name: 'Price',
-      value: product.symbol + product.price,
-      inline: true
-    },
-    {
-      name: 'Rating',
-      value: product.rating,
-      inline: true
-    },
-    {
-      name: 'Shipping',
-      value: product.shipping,
-      inline: true
-    },
-    {
-      name: 'Availability',
-      value: product.availability,
-      inline: true
-    }
-    ])
+  }
+
+  if (product.features && Array.isArray(product.features) && product.features.length > 0 && product.features[0] !== 'none') {
+    enhancedEmbed.addFields([{
+      name: enhancedEmbed.getMessage('features'),
+      value: product.features.slice(0, 3).join('\n\n'),
+      inline: false
+    }])
+  }
 
   safeSend(message, {
-    embeds: [embed]
+    embeds: [enhancedEmbed]
   })
 }

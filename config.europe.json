@@ -1,0 +1,73 @@
+{
+  "prefix": "!",
+  "token": "my_bot_token",
+  "minutes_per_check": 2,
+  "seconds_between_check": 5,
+  "url_params": {},
+  "guild_item_limit": 5,
+  "cache_limit": 10,
+  "required_perms": ["permission_1", "permission_2"],
+  "tld": "fr",
+  "auto_cart_link": true,
+  "debug_enabled": false,
+  "custom_chromium_exec": "",
+  "region": "europe",
+  "default_currency": "EUR",
+  "supported_domains": [
+    {
+      "tld": "fr",
+      "country": "France",
+      "currency": "EUR",
+      "priority": 1
+    },
+    {
+      "tld": "de", 
+      "country": "Germany",
+      "currency": "EUR",
+      "priority": 2
+    },
+    {
+      "tld": "it",
+      "country": "Italy", 
+      "currency": "EUR",
+      "priority": 3
+    },
+    {
+      "tld": "es",
+      "country": "Spain",
+      "currency": "EUR", 
+      "priority": 4
+    },
+    {
+      "tld": "co.uk",
+      "country": "United Kingdom",
+      "currency": "GBP",
+      "priority": 5
+    }
+  ],
+  "language": "fr",
+  "messages": {
+    "search_no_term": "Veuillez fournir un terme de recherche",
+    "search_no_results": "Aucun résultat trouvé pour \"{query}\"",
+    "search_results_title": "Résultats de recherche pour : {query}",
+    "watch_limit_reached": "Vous avez atteint le nombre maximum d'articles ({limit})",
+    "watch_invalid_link": "Veuillez fournir un lien valide",
+    "watch_item_exists": "L'article existe déjà dans la liste de surveillance",
+    "watch_success_link": "Article ajouté avec succès à la surveillance : {link}",
+    "watch_success_query": "Requête ajoutée avec succès : {query}",
+    "watch_success_category": "Catégorie ajoutée avec succès : {category}",
+    "watch_price_limit": "Prix doit être inférieur à {symbol}{price}",
+    "watch_price_percentage": "Prix doit être réduit de plus de {percentage}% par rapport au prix précédent détecté",
+    "watch_price_difference": "Prix doit être réduit de plus de {symbol}{difference} par rapport au prix précédent détecté",
+    "unwatch_invalid": "Numéro/article invalide",
+    "unwatch_empty": "Aucun article existant dans la liste de surveillance à supprimer !",
+    "unwatch_not_found": "Ce n'est pas un article existant !",
+    "unwatch_success": "Article supprimé avec succès : {item}",
+    "details_invalid_link": "Lien invalide",
+    "price_alert_title": "Alerte de prix pour \"{item}\"",
+    "price_old": "Ancien prix",
+    "price_new": "Nouveau prix", 
+    "price_with_coupon": "(réduction de {amount} avec coupon)",
+    "in_stock_alert": "Article maintenant en stock !"
+  }
+}
